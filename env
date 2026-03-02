@@ -1,0 +1,9 @@
+## TTRAG project Environment Variables
+TTRAG_DATA_DIR=../dataset/
+TTRAG_CHECKPOINTS_DIR=results/model_checkpoints/
+TTRAG_RESULTS_DIR=results/model_results/
+
+# Weights and Biases Environment Variables
+WANDB_DIR=../wandb/wandb    
+WANDB_CACHE_DIR=../.cache/wandb 
+

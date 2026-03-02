@@ -1,0 +1,77 @@
+pretraining_run_name: None
+pretraining_opt_steps: null
+
+#Experiment parameters
+random_seed: 13
+notes: "Aligning"
+task_name: "retrieval" 
+model_name: "TraceEncoder"
+
+# Text encoder parameters
+text_encoder_name: "nomic-ai/nomic-embed-text-v1.5"
+num_negatives: 64
+hard_negative_mining: True
+
+# overridden by the pretraining run name
+seq_len_channel: 182
+patch_len: 1  # be overridden by the pretraining run name
+patch_stride_len: 1
+revin_affine: False
+d_model: 384    #384, 768 or 1024
+dropout: 0.1
+n_heads: 6
+e_layers: 6
+attention_dropout: 0.1
+torch_dtype: "bfloat16"
+value_embedding_bias: False # Whether to add biases to the value embeddings
+orth_gain: 1.41
+pos_embed_type: "rel_pos" # "rope" or "rel_pos" add positional embedding to the input
+set_input_mask: True # Whether to set the input mask
+output_attention: False # Whether to output the attention weights
+activation: 'gelu'      # "gelu" or "relu"
+flash_attention: False
+
+
+# Logging
+log_interval: 1
+debug: False
+
+# Training parameters
+finetuning_mode: "end-to-end" # "linear-probing" "end-to-end"
+
+mask_ratio: 0.3
+max_epoch: 300
+optimizer_name : "AdamW"
+enable_gradient_checkpointing: True
+max_norm: 5
+weight_decay: 0.05
+lr_scheduler_type: 'linearwarmupcosinelr' # "onecyclelr" "linearwarmupcosinelr"
+pct_start: 0.3
+init_lr: 0.0001
+min_lr: 0.00001 # 1e-5
+lr_decay_rate: 0.9
+warmup_lr: 0.00001 # 1e-5
+warmup_steps: 1000
+use_amp: True
+beta: 1
+distributed: True
+early_stop: False
+patience: 50
+delta: 0.001
+
+
+
+# Dataset parameters
+n_channels: 7
+scale : True
+upsampling_pad_direction : "backward"
+upsampling_type : "pad"
+downsampling_type : "interpolate"
+pad_mode : "constant"
+pad_constant_values : 0
+train_batch_size : 512 
+val_batch_size: 512 
+shuffle : True
+num_workers : 5
+pin_memory : True
+drop_last : False

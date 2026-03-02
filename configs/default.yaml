@@ -1,0 +1,67 @@
+#Experiment parameters
+random_seed: 13
+notes: "Pre-training run"
+
+# Encoder parameters
+task_name: "pretraining" 
+
+# Model parameters
+model_name: "TraceEncoder"
+seq_len_channel: 180
+patch_len: 8
+patch_stride_len: 8
+revin_affine: False
+d_model: 384    #384, 768 or 1024
+dropout: 0.1
+n_heads: 8
+e_layers: 6
+attention_dropout: 0.1
+torch_dtype: "bfloat16"
+value_embedding_bias: False # Whether to add biases to the value embeddings
+orth_gain: 1.41
+pos_embed_type: "rel_pos" # "rope" or "rel_pos" add positional embedding to the input
+set_input_mask: True # Whether to set the input mask
+output_attention: False # Whether to output the attention weights
+activation: 'gelu'    
+flash_attention: False
+# transformer_type: "encoder_only" # "encoder_decoder" "encoder_only" "decoder_only"
+# transformer_backbone: 'google/flan-t5-large' # "PatchTST" "google/flan-t5-base" "t5-large"
+# freeze_transformer_backbone: False # Whether to freeze the transformer backbone
+
+# Logging
+log_interval: 100000
+checkpoint_interval: 5000
+debug: True
+
+# Training parameters
+mask_ratio: 0.3
+optimizer_name : "AdamW"
+enable_gradient_checkpointing: True
+max_norm: 5
+
+weight_decay: 0.05
+lr_scheduler_type: 'linearwarmupcosinelr'
+init_lr: 0.0001 # 1e-4
+min_lr: 0.00001 # 1e-5
+lr_decay_rate: 0.9
+warmup_lr: 0.00001 # 1e-5
+warmup_steps: 1000
+use_amp: True
+max_epoch: 50
+
+# Dataset parameters
+n_channels: 7
+num_class: 9
+target_col : 'OT'
+scale : True
+upsampling_pad_direction : "backward"
+upsampling_type : "pad"
+downsampling_type : "interpolate"
+pad_mode : "constant"
+pad_constant_values : 0
+train_batch_size : 2048 # 1024 2048 3072 4096
+val_batch_size: 3072 # 1024 2048 3072 4096 
+shuffle : True
+num_workers : 5
+pin_memory : True
+drop_last : False
