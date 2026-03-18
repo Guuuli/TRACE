@@ -12,13 +12,10 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 NOTES = "Aligning"
 
 def main_worker():
-    # ========== Distributed Environment Setup ==========
-    local_rank = int(os.environ["LOCAL_RANK"])
-    global_rank = int(os.environ["RANK"])
-    world_size = int(os.environ["WORLD_SIZE"])
-
-    torch.cuda.set_device(local_rank)
-    dist.init_process_group(backend="nccl")
+    # ========== Runtime Setup ==========
+    local_rank = 0
+    global_rank = 0
+    world_size = 1
 
     # ========== CLI Argument Parsing ==========
     parser = argparse.ArgumentParser()
@@ -46,7 +43,7 @@ def main_worker():
     config["device"] = local_rank
     config["rank"] = global_rank
     config["world_size"] = world_size
-    config["distributed"] = True
+    config["distributed"] = False
     config["checkpoint_path"] = PATHS.CHECKPOINTS_DIR + "context_align/"
     config["result_dir"] = PATHS.RESULTS_DIR + "context_align/"
     make_dir_if_not_exists(config["checkpoint_path"])
@@ -75,7 +72,8 @@ def main_worker():
     if global_rank == 0:
         task_obj.end_logger()
 
-    dist.destroy_process_group()
+    if dist.is_available() and dist.is_initialized():
+        dist.destroy_process_group()
 
 
 if __name__ == "__main__":
