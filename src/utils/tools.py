@@ -196,6 +196,8 @@ def broadcast_string(s, src=0):
 
 def gather_across_gpus(obj):
     """Gather list of python objects across all ranks."""
+    if not dist.is_available() or not dist.is_initialized():
+        return [obj]
     world_size = dist.get_world_size()
     gathered_obj = [None for _ in range(world_size)]
     dist.all_gather_object(gathered_obj, obj)
@@ -208,6 +210,8 @@ def flatten_nested_list(nested):
 
 def gather_all_tensor(tensor):
     # gather tensor from all GPUs
+    if not dist.is_available() or not dist.is_initialized():
+        return tensor
     world_size = dist.get_world_size()
     if world_size == 1:
         return tensor
@@ -222,6 +226,8 @@ def gather_all_tensor_with_padding(tensor, pad_value=0.0):
     - tensor: [N_local, ...] (can be 1D, 2D, etc.)
     - returns: [N_total, ...]
     """
+    if not dist.is_available() or not dist.is_initialized():
+        return tensor
     world_size = dist.get_world_size()
     if world_size == 1:
         return tensor
@@ -252,6 +258,8 @@ def gather_all_tensor_with_padding(tensor, pad_value=0.0):
 
 
 def gather_all_list_strings(all_raw_descriptions):
+    if not dist.is_available() or not dist.is_initialized():
+        return all_raw_descriptions
     if dist.get_world_size() > 1:
         local_raw_descriptions = all_raw_descriptions  # list[str]
         gathered_raw_descriptions = [None for _ in range(dist.get_world_size())]

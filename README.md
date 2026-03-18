@@ -66,11 +66,8 @@ TRACE uses a two-stage training pipline. Stage 3 serves as an optional stage for
 ### Stage 1: Pretrain
 
 ```bash
-CUDA_VISIBLE_DEVICES=0,1 torchrun \
-  --nproc_per_node=2 \
-  --master-port=<MASTER_PORT_STAGE1> \
-  pretrain.py \
-  --config configs/pretrain.yaml \
+python pretrain.py \
+  --config configs/pretrain.yaml
 ```
 
 After pretraining, record the run name.
@@ -84,10 +81,7 @@ Important:
 ### Stage 2: Context Align
 
 ```bash
-CUDA_VISIBLE_DEVICES=0,1 torchrun \
-  --nproc_per_node=2 \
-  --master-port=<MASTER_PORT_STAGE2> \
-  context_align.py \
+python context_align.py \
   --config configs/align.yaml \
   --pretraining_run_name "<PRETRAIN_RUN_NAME>" \
   --cross_attend

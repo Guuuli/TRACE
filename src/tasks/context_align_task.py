@@ -254,8 +254,11 @@ class ContextAligning(Tasks):
         self.scaler = torch.cuda.amp.GradScaler(enabled=self.args.use_amp)
         self._init_lr_scheduler(type=self.args.lr_scheduler_type)
         
-        self.model.to(self.args.rank)
-        self.model = torch.nn.parallel.DistributedDataParallel(self.model, device_ids=[self.args.rank],find_unused_parameters=True)
+        self.model.to(self.device)
+        if self.args.distributed and torch.distributed.is_available() and torch.distributed.is_initialized() and self.args.world_size > 1:
+            self.model = torch.nn.parallel.DistributedDataParallel(
+                self.model, device_ids=[self.args.rank], find_unused_parameters=True
+            )
         
         opt_steps = 0
         cur_epoch = 0

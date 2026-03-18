@@ -114,8 +114,11 @@ class Pretraining(Tasks):
         self.classification_criterion = nn.CrossEntropyLoss()
         self.scaler = torch.cuda.amp.GradScaler(enabled=self.args.use_amp)
         self._init_lr_scheduler()
-        self.model.to(self.args.rank)
-        self.model = torch.nn.parallel.DistributedDataParallel(self.model, device_ids=[self.args.rank], find_unused_parameters=True )
+        self.model.to(self.device)
+        if self.args.distributed and dist.is_available() and dist.is_initialized() and self.args.world_size > 1:
+            self.model = torch.nn.parallel.DistributedDataParallel(
+                self.model, device_ids=[self.args.rank], find_unused_parameters=True
+            )
         self.early_stopping = EarlyStopping(patience=self.args.patience, delta=self.args.delta)
         # self.evaluate_model()
         
@@ -189,7 +192,8 @@ class Pretraining(Tasks):
                     self.early_stopping(eval_metrics.val_loss["val_total_loss"], self.model, path=os.path.join(path, "best_checkpoint.pth"))
 
                 stop_signal = torch.tensor(float(self.early_stopping.early_stop), device=self.device)
-                dist.broadcast(stop_signal, src=0)
+                if self.args.distributed and dist.is_available() and dist.is_initialized() and self.args.world_size > 1:
+                    dist.broadcast(stop_signal, src=0)
 
                 if stop_signal.item() > 0:
                     break
@@ -216,4 +220,3 @@ class Pretraining(Tasks):
             self.logger.log(eval_metrics.val_loss)
             self.logger.log(eval_metrics.test_loss)
         return eval_metrics
-
